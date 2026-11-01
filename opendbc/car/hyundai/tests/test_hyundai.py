@@ -2,7 +2,7 @@ import unittest
 
 from opendbc.car import gen_empty_fingerprint
 from opendbc.car.structs import CarParams
-from opendbc.car.fw_versions import build_fw_dict
+from opendbc.car.fw_versions import build_fw_dict, match_fw_to_car_exact
 from opendbc.car.hyundai.interface import CarInterface
 from opendbc.car.hyundai.hyundaicanfd import CanBus
 from opendbc.car.hyundai.radar_interface import RADAR_START_ADDR
@@ -54,6 +54,13 @@ def cars_with(flags):
 
 
 class TestHyundaiFingerprint(unittest.TestCase):
+  def test_sportage_2025_eu_mhev_firmware(self):
+    versions = {
+      (0x7c4, None): {b'\xf1\x00NQ5 FR_CMR AT EUR LHD 1.00 1.02 99211-R2000 D12'},
+      (0x7d0, None): {b'\xf1\x00NQ5__               1.00 1.03 99110R2000          '},
+    }
+    self.assertEqual(match_fw_to_car_exact(versions, match_brand='hyundai', log=False), {CAR.KIA_SPORTAGE_5TH_GEN})
+
   def test_feature_detection(self):
     # LKA steering
     for lka_steering in (True, False):
